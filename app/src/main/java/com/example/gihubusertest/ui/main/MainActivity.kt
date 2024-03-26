@@ -1,11 +1,11 @@
 package com.example.gihubusertest.ui.main
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gihubusertest.data.model.User
 import com.example.gihubusertest.databinding.ActivityMainBinding
@@ -26,34 +26,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupViews() {
-        adapter = UserAdapter()
-
-        adapter.setOnItemClickCallback(object : UserAdapter.OnItemClickCallback{
-            override fun onItemClicked(data: User) {
-                Intent(this@MainActivity, DetailUserActivity::class.java).also {
-                    it.putExtra(DetailUserActivity.EXTRA_USERNAME, data.login)
-                    startActivity(it)
+        adapter = UserAdapter().apply {
+            setOnItemClickCallback(object : UserAdapter.OnItemClickCallback {
+                override fun onItemClicked(data: User) {
+                    navigateToDetailUser(data.login)
                 }
-            }
-
-        })
-
-        binding.rvUser.apply {
-            layoutManager = LinearLayoutManager(this@MainActivity)
-            setHasFixedSize(true)
-            adapter = this@MainActivity.adapter
+            })
         }
 
-        binding.btnSearch.setOnClickListener {
-            searchUser()
-        }
+        binding.apply {
+            rvUser.layoutManager = LinearLayoutManager(this@MainActivity)
+            rvUser.setHasFixedSize(true)
+            rvUser.adapter = adapter
 
-        binding.etQuery.setOnKeyListener { _, keyCode, event ->
-            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                searchUser()
-                return@setOnKeyListener true
+            btnSearch.setOnClickListener { searchUser() }
+
+            etQuery.setOnKeyListener { _, keyCode, event ->
+                if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                    searchUser()
+                    return@setOnKeyListener true
+                }
+                false
             }
-            false
         }
     }
 
@@ -76,5 +70,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun showLoading(state: Boolean) {
         binding.progressBar.visibility = if (state) View.VISIBLE else View.GONE
+    }
+
+    private fun navigateToDetailUser(username: String) {
+        Intent(this, DetailUserActivity::class.java).apply {
+            putExtra(DetailUserActivity.EXTRA_USERNAME, username)
+            startActivity(this)
+        }
     }
 }
