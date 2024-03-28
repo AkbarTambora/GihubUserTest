@@ -6,6 +6,7 @@ import android.view.KeyEvent
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gihubusertest.data.model.User
 import com.example.gihubusertest.databinding.ActivityMainBinding
@@ -14,7 +15,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: UserAdapter
-    private val viewModel by viewModels<MainViewModel>()
+    private val mainViewModel by viewModels<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,25 +35,23 @@ class MainActivity : AppCompatActivity() {
             })
         }
 
-        binding.apply {
-            rvUser.layoutManager = LinearLayoutManager(this@MainActivity)
-            rvUser.setHasFixedSize(true)
-            rvUser.adapter = adapter
+        binding.rvUser.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            setHasFixedSize(true)
+            adapter = this@MainActivity.adapter
+        }
 
-            btnSearch.setOnClickListener { searchUser() }
+        binding.btnSearch.setOnClickListener { searchUser() }
 
-            etQuery.setOnKeyListener { _, keyCode, event ->
-                if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                    searchUser()
-                    return@setOnKeyListener true
-                }
-                false
+        binding.etQuery.addTextChangedListener {
+            if (it?.toString()?.isNotEmpty() == true) {
+                searchUser()
             }
         }
     }
 
     private fun observeViewModel() {
-        viewModel.listUsers.observe(this) { users ->
+        mainViewModel.listUsers.observe(this) { users ->
             users?.let {
                 adapter.setList(it)
                 showLoading(false)
@@ -64,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         val query = binding.etQuery.text.toString().trim()
         if (query.isNotEmpty()) {
             showLoading(true)
-            viewModel.setSearchUsers(query)
+            mainViewModel.setSearchUsers(query)
         }
     }
 

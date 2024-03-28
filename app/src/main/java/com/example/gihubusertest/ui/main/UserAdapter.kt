@@ -10,21 +10,31 @@ import com.example.gihubusertest.databinding.ItemUserBinding
 
 class UserAdapter : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
 
-    private val userList = ArrayList<User>()
-
+    private var userList: List<User> = emptyList()
     private var onItemClickCallback: OnItemClickCallback? = null
 
-    fun setOnItemClickCallback (onItemClickCallback: OnItemClickCallback) {
+    fun setOnItemClickCallback(onItemClickCallback: OnItemClickCallback) {
         this.onItemClickCallback = onItemClickCallback
     }
 
-    fun setList(users: ArrayList<User>) {
-        userList.clear()
-        userList.addAll(users)
+    fun setList(users: List<User>) {
+        userList = users
         notifyDataSetChanged()
     }
 
-    inner class UserViewHolder(private val binding: ItemUserBinding): RecyclerView.ViewHolder(binding.root) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ItemUserBinding.inflate(inflater, parent, false)
+        return UserViewHolder(binding)
+    }
+
+    override fun getItemCount(): Int = userList.size
+
+    override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
+        holder.bind(userList[position])
+    }
+
+    inner class UserViewHolder(private val binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(user: User) {
             binding.root.setOnClickListener {
                 onItemClickCallback?.onItemClicked(user)
@@ -39,17 +49,6 @@ class UserAdapter : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
                 tvUsername.text = user.login
             }
         }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
-        val view = ItemUserBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return UserViewHolder(view)
-    }
-
-    override fun getItemCount(): Int = userList.size
-
-    override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-        holder.bind(userList[position])
     }
 
     interface OnItemClickCallback {

@@ -8,8 +8,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.example.gihubusertest.R
 
-class SectionPagerAdapter(private val mCtx: Context, fm: FragmentManager, data: Bundle):
-    FragmentPagerAdapter(fm) {
+class SectionPagerAdapter(private val mCtx: Context, fm: FragmentManager, data: Bundle) :
+    FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     private var fragmentBundle: Bundle
 
@@ -18,23 +18,19 @@ class SectionPagerAdapter(private val mCtx: Context, fm: FragmentManager, data: 
     }
 
     @StringRes
-    private val TAB_TITLES = intArrayOf(R.string.tab_1, R.string.tab_2)
+    private val tabTitles = arrayOf(R.string.tab_1, R.string.tab_2)
 
-    override fun getCount(): Int = 2
+    override fun getCount(): Int = tabTitles.size
 
     override fun getItem(position: Int): Fragment {
-        var fragment: Fragment? = null
-        when (position) {
-            0 -> fragment = FollowingFragment()
-            1 -> fragment = FollowersFragment()
+        return when (position) {
+            0 -> FollowingFragment().apply { arguments = fragmentBundle }
+            1 -> FollowersFragment().apply { arguments = fragmentBundle }
+            else -> throw IllegalStateException("Invalid position: $position")
         }
-        fragment?.arguments = this.fragmentBundle
-        return fragment as Fragment
     }
 
     override fun getPageTitle(position: Int): CharSequence? {
-        return mCtx.resources.getString(TAB_TITLES[position])
+        return mCtx.resources.getString(tabTitles.getOrNull(position) ?: R.string.tab_unknown)
     }
-
-
 }
