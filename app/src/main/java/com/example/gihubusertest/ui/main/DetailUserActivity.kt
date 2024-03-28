@@ -1,7 +1,7 @@
 package com.example.gihubusertest.ui.main
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -22,8 +22,10 @@ class DetailUserActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val username = intent.getStringExtra(EXTRA_USERNAME)
+        val bundle = Bundle()
+        bundle.putString(EXTRA_USERNAME, username)
 
-        viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(DetailUserViewModel::class.java)
+        viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())[DetailUserViewModel::class.java]
 
         if (username != null) {
             viewModel.setUsersDetail(username)
@@ -45,7 +47,7 @@ class DetailUserActivity : AppCompatActivity() {
             }
         }
 
-        val sectionPagerAdapter = SectionPagerAdapter(this, supportFragmentManager)
+        val sectionPagerAdapter = SectionPagerAdapter(this, supportFragmentManager, bundle)
         binding.apply {
             viewPager.adapter = sectionPagerAdapter
             tab.setupWithViewPager(viewPager)
