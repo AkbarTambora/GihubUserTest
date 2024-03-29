@@ -5,12 +5,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.example.gihubusertest.data.model.DetailUserResponse
 import com.example.gihubusertest.data.model.User
 import com.example.gihubusertest.databinding.ItemUserBinding
 
 class UserAdapter : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
 
     private var userList: List<User> = emptyList()
+    private var userDetailList: List<DetailUserResponse> = emptyList()
     private var onItemClickCallback: OnItemClickCallback? = null
 
     fun setOnItemClickCallback(onItemClickCallback: OnItemClickCallback) {
@@ -19,6 +21,11 @@ class UserAdapter : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
 
     fun setList(users: List<User>) {
         userList = users
+        notifyDataSetChanged()
+    }
+
+    fun setDetailList(usersDetail: DetailUserResponse) {
+        userDetailList = listOf(usersDetail)
         notifyDataSetChanged()
     }
 
