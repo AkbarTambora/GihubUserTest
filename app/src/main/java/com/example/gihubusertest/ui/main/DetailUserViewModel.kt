@@ -10,7 +10,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class DetailUserViewModel: ViewModel() {
+class DetailUserViewModel : ViewModel() {
 
     private val _users = MutableLiveData<DetailUserResponse>()
     val users: LiveData<DetailUserResponse> = _users
@@ -20,7 +20,6 @@ class DetailUserViewModel: ViewModel() {
 
     companion object {
         private const val TAG = "DetailUserViewModel"
-        private const val USERNAME_LOGIN = ""
     }
 
     fun setUsersDetail(username: String) {
@@ -40,9 +39,5 @@ class DetailUserViewModel: ViewModel() {
                 Log.e(TAG, "onFailure: ${t.message.toString()}")
             }
         })
-    }
-
-    fun getUsersDetail(): LiveData<DetailUserResponse> {
-        return _users
     }
 }
