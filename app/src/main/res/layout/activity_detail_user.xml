@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/activity_detail_user"
-    tools:context=".ui.main.DetailUserActivity">
+    tools:context=".ui.detail.DetailUserActivity">
 
     <ImageView
         android:id="@+id/image_profile"

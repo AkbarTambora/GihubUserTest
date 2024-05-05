@@ -1,4 +1,4 @@
-package com.example.gihubusertest.ui.main
+package com.example.gihubusertest.ui.detail
 
 import android.os.Bundle
 import android.view.View
@@ -7,12 +7,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gihubusertest.R
 import com.example.gihubusertest.databinding.FragmentFollowBinding
+import com.example.gihubusertest.ui.main.UserAdapter
 
-class FollowingFragment: Fragment(R.layout.fragment_follow) {
+class FollowersFragment: Fragment(R.layout.fragment_follow) {
 
     private var _binding : FragmentFollowBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewModel: FollowingViewModel
+    private lateinit var viewModel: FollowersViewModel
     private lateinit var adapter: UserAdapter
     private lateinit var username: String
 
@@ -34,15 +35,15 @@ class FollowingFragment: Fragment(R.layout.fragment_follow) {
         }
 
         showLoading(true)
-        viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(FollowingViewModel::class.java)
-        viewModel.setListFollowing(username)
+        viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(
+            FollowersViewModel::class.java)
+        viewModel.setListFollowers(username)
         viewModel.getUsersDetail().observe(viewLifecycleOwner) {
             if (it != null) {
                 adapter.setList(it)
                 showLoading(false)
             }
         }
-
 
     }
 

@@ -2,19 +2,25 @@ package com.example.gihubusertest.ui.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.gihubusertest.R
 import com.example.gihubusertest.data.model.User
 import com.example.gihubusertest.databinding.ActivityMainBinding
+import com.example.gihubusertest.ui.detail.DetailUserActivity
+import com.example.gihubusertest.ui.theme.SwitchThemeActivity
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: UserAdapter
     private val mainViewModel by viewModels<MainViewModel>()
+    private var isDarkTheme: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,5 +81,28 @@ class MainActivity : AppCompatActivity() {
             putExtra(DetailUserActivity.EXTRA_USERNAME, username)
             startActivity(this)
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.option_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu1 -> {
+                //navigate to SwitchThemeActivity
+                val intent = Intent(this, SwitchThemeActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+            R.id.menu2 -> {
+                supportFragmentManager.beginTransaction()
+                    .add(R.id.container, FavoriteFragment())
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

@@ -1,4 +1,4 @@
-package com.example.gihubusertest.ui.main
+package com.example.gihubusertest.ui.detail
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -10,17 +10,17 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class FollowersViewModel: ViewModel() {
+class FollowingViewModel: ViewModel() {
 
-    private val _listFollowers = MutableLiveData<ArrayList<User>>()
-    val listFollowers: LiveData<ArrayList<User>> = _listFollowers
+    private val _listFollowing = MutableLiveData<ArrayList<User>>()
+    val listFollowing: LiveData<ArrayList<User>> = _listFollowing
 
-    fun setListFollowers(username: String) {
-        RetrofitClient.apiInstance.getFollowersDetail(username)
+    fun setListFollowing(username: String) {
+        RetrofitClient.apiInstance.getFollowingDetail(username)
             .enqueue(object : Callback<ArrayList<User>> {
             override fun onResponse(call: Call<ArrayList<User>>, response: Response<ArrayList<User>>) {
                 if (response.isSuccessful) {
-                    _listFollowers.postValue(response.body())
+                    _listFollowing.postValue(response.body())
                 }
             }
 
@@ -31,6 +31,6 @@ class FollowersViewModel: ViewModel() {
     }
 
     fun getUsersDetail(): LiveData<ArrayList<User>> {
-        return listFollowers
+        return listFollowing
     }
 }

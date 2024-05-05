@@ -5,5 +5,10 @@
     <string name="tab_2">Followers</string>
 
     <string name="tab_unknown">Unknown Tab</string>
+    <string name="menu_1">Switch Theme</string>
+    <string name="menu_2">Favorite</string>
+
+    <string name="hello_favorite_fragment">Hello, now you\'re in Favorite Fragment</string>
+    <string name="dark_mode">Dark Mode</string>
 
 </resources>
