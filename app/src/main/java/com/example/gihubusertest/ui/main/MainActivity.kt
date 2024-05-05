@@ -7,20 +7,27 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gihubusertest.R
 import com.example.gihubusertest.data.model.User
 import com.example.gihubusertest.databinding.ActivityMainBinding
 import com.example.gihubusertest.ui.detail.DetailUserActivity
+import com.example.gihubusertest.ui.theme.SettingPreferences
 import com.example.gihubusertest.ui.theme.SwitchThemeActivity
+import com.example.gihubusertest.ui.theme.ThemeViewModel
+import com.example.gihubusertest.ui.theme.ViewModelFactory
+import com.example.gihubusertest.ui.theme.dataStore
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: UserAdapter
     private val mainViewModel by viewModels<MainViewModel>()
-    private var isDarkTheme: Boolean = false
+    private lateinit var themeViewModel: ThemeViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +67,17 @@ class MainActivity : AppCompatActivity() {
             users?.let {
                 adapter.setList(it)
                 showLoading(false)
+            }
+        }
+
+        val pref = SettingPreferences.getInstance(application.dataStore)
+        themeViewModel = ViewModelProvider(this, ViewModelFactory(pref)).get(ThemeViewModel::class.java)
+
+        themeViewModel.getThemeSettings().observe(this) { isDarkModeActive ->
+            if (isDarkModeActive) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             }
         }
     }
