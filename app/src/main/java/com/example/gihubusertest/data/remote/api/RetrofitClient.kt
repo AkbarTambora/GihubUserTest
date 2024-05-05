@@ -1,4 +1,4 @@
-package com.example.gihubusertest.api
+package com.example.gihubusertest.data.remote.api
 
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

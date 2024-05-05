@@ -1,4 +1,4 @@
-package com.example.gihubusertest.api
+package com.example.gihubusertest.data.remote.api
 
 import com.example.gihubusertest.data.model.DetailUserResponse
 import com.example.gihubusertest.data.model.User

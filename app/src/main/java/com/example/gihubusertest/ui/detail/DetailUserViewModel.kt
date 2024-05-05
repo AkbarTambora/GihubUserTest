@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.gihubusertest.api.RetrofitClient
+import com.example.gihubusertest.data.remote.api.RetrofitClient
 import com.example.gihubusertest.data.model.DetailUserResponse
 import retrofit2.Call
 import retrofit2.Callback
