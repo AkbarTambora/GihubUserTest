@@ -12,4 +12,6 @@
     <color name="orange_light">#FFAB91</color>
     <color name="orange_dark">#E64A19</color>
     <color name="colorSubtitle">#757575</color>
+
+    <color name="placeholder">#6FB6B6B6</color>
 </resources>

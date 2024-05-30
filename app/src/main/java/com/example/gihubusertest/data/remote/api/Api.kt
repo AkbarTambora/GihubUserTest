@@ -14,6 +14,11 @@ interface Api {
         @Query("q") query: String
     ): Call<UserResponse>
 
+    @GET("search/users")
+    fun getSearchUsersRep(
+        @Query("q") query: String
+    ): UserResponse
+
     @GET("users/{username}")
     fun getUserDetail(
         @Path("username") username: String

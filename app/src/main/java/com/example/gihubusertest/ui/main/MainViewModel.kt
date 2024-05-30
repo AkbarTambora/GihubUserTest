@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.example.gihubusertest.data.remote.api.RetrofitClient
 import com.example.gihubusertest.data.model.User
 import com.example.gihubusertest.data.model.UserResponse
+import com.example.gihubusertest.data.remote.api.RetrofitClient.Companion.getApiService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -17,7 +18,8 @@ class MainViewModel : ViewModel() {
     val listUsers: LiveData<ArrayList<User>> = _listUsers
 
     fun setSearchUsers(query: String) {
-        RetrofitClient.apiInstance.getSearchUsers(query).enqueue(object : Callback<UserResponse> {
+        //RetrofitClient.apiInstance.getSearchUsers(query).enqueue(object : Callback<UserResponse> {
+        getApiService().getSearchUsers(query).enqueue(object : Callback<UserResponse> {
             override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>) {
                 if (response.isSuccessful) {
                     _listUsers.postValue(response.body()?.items)

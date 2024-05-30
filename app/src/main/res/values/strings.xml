@@ -11,4 +11,10 @@
     <string name="hello_favorite_fragment">Hello, now you\'re in Favorite Fragment</string>
     <string name="dark_mode">Dark Mode</string>
 
+    <string name="home">Home</string>
+    <string name="bookmark">Bookmark</string>
+    <string name="title">Title</string>
+    <string name="published_date">Published Date</string>
+    <string name="save_bookmark">Save Bookmark?</string>
+
 </resources>
