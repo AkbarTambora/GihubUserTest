@@ -14,11 +14,6 @@ interface Api {
         @Query("q") query: String
     ): Call<UserResponse>
 
-    @GET("search/users")
-    fun getSearchUsersRep(
-        @Query("q") query: String
-    ): UserResponse
-
     @GET("users/{username}")
     fun getUserDetail(
         @Path("username") username: String
@@ -27,11 +22,10 @@ interface Api {
     @GET("users/{username}/following")
     fun getFollowingDetail(
         @Path("username") username: String
-    ): Call<ArrayList<User>>
+    ): Call<List<User>>
 
     @GET("users/{username}/followers")
     fun getFollowersDetail(
         @Path("username") username: String
-    ): Call<ArrayList<User>>
-
+    ): Call<List<User>>
 }

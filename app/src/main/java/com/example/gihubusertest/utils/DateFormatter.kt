@@ -14,15 +14,12 @@ class DateFormatter {
         val currentDf: DateFormat = SimpleDateFormat(currentFormat, Locale.getDefault())
         currentDf.timeZone = TimeZone.getTimeZone(timezone)
         val targetDf: DateFormat = SimpleDateFormat(targetFormat, Locale.getDefault())
-        var targetDate: String? = null
-        try {
+        return try {
             val date = currentDf.parse(currentDate)
-            if (date != null) {
-                targetDate = targetDf.format(date)
-            }
+            date?.let { targetDf.format(it) }
         } catch (ex: ParseException) {
             ex.printStackTrace()
+            null
         }
-        return targetDate
     }
 }

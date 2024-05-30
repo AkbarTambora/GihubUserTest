@@ -5,17 +5,17 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "user")
-class UserEntity (
-    @field:ColumnInfo(name = "id")
-    @field:PrimaryKey
+data class UserEntity (
+    @PrimaryKey
+    @ColumnInfo(name = "id")
     val id: Int,
 
-    @field:ColumnInfo(name = "login")
+    @ColumnInfo(name = "login")
     val login: String,
 
-    @field:ColumnInfo(name = "avatar_url")
+    @ColumnInfo(name = "avatar_url")
     val avatarUrl: String,
 
-    @field:ColumnInfo(name = "bookmarked")
+    @ColumnInfo(name = "bookmarked")
     var isBookmarked: Boolean
 )

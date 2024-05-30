@@ -5,27 +5,26 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.gihubusertest.R
-import com.example.gihubusertest.data.model.User
-import com.example.gihubusertest.databinding.ActivityMainBinding
+import com.example.gihubusertest.data.local.entity.UserEntity
 import com.example.gihubusertest.ui.detail.DetailUserActivity
 import com.example.gihubusertest.ui.theme.SettingPreferences
 import com.example.gihubusertest.ui.theme.SwitchThemeActivity
 import com.example.gihubusertest.ui.theme.ThemeViewModel
-import com.example.gihubusertest.ui.theme.ViewModelFactory
+import com.example.gihubusertest.ui.theme.ThemeViewModelFactory
 import com.example.gihubusertest.ui.theme.dataStore
+import com.example.githubusertest.R
+import com.example.githubusertest.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: UserAdapter
-    private val mainViewModel by viewModels<MainViewModel>()
+    private lateinit var mainViewModel: MainViewModel
     private lateinit var themeViewModel: ThemeViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,18 +32,22 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val factory = ViewModelFactory.getInstance(applicationContext)
+        mainViewModel = ViewModelProvider(this, factory).get(MainViewModel::class.java)
+
         setupViews()
         observeViewModel()
     }
 
     private fun setupViews() {
-        adapter = UserAdapter().apply {
-            setOnItemClickCallback(object : UserAdapter.OnItemClickCallback {
-                override fun onItemClicked(data: User) {
-                    navigateToDetailUser(data.login)
-                }
-            })
-        }
+        adapter = UserAdapter(
+            onItemClick = { userEntity ->
+                navigateToDetailUser(userEntity.login)
+            },
+            onBookmarkClick = { userEntity ->
+                toggleBookmark(userEntity)
+            }
+        )
 
         binding.rvUser.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
@@ -63,14 +66,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun observeViewModel() {
         mainViewModel.listUsers.observe(this) { users ->
-            users?.let {
-                adapter.setList(it)
+            if (users != null) {
+                adapter.submitList(users)  // Gunakan submitList untuk ListAdapter
                 showLoading(false)
+            } else {
+                adapter.submitList(emptyList())
             }
         }
 
         val pref = SettingPreferences.getInstance(application.dataStore)
-        themeViewModel = ViewModelProvider(this, ViewModelFactory(pref)).get(ThemeViewModel::class.java)
+        themeViewModel = ViewModelProvider(this, ThemeViewModelFactory(pref)).get(ThemeViewModel::class.java)
 
         themeViewModel.getThemeSettings().observe(this) { isDarkModeActive ->
             if (isDarkModeActive) {
@@ -100,6 +105,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun toggleBookmark(user: UserEntity) {
+        val newBookmarkState = !user.isBookmarked
+        mainViewModel.setBookmarkedUsers(user, newBookmarkState)
+        adapter.notifyItemChanged(adapter.currentList.indexOf(user))
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.option_menu, menu)
         return true
@@ -108,16 +119,16 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu1 -> {
-                //navigate to SwitchThemeActivity
                 val intent = Intent(this, SwitchThemeActivity::class.java)
                 startActivity(intent)
                 return true
             }
             R.id.menu2 -> {
                 supportFragmentManager.beginTransaction()
-                    .add(R.id.container, FavoriteFragment())
+                    .replace(R.id.container, FavoriteFragment())
                     .addToBackStack(null)
                     .commit()
+                return true
             }
         }
         return super.onOptionsItemSelected(item)

@@ -7,8 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.gihubusertest.data.model.DetailUserResponse
-import com.example.gihubusertest.databinding.ActivityDetailUserBinding
 import com.example.gihubusertest.ui.main.SectionPagerAdapter
+import com.example.githubusertest.databinding.ActivityDetailUserBinding
 
 class DetailUserActivity : AppCompatActivity() {
 
@@ -24,15 +24,16 @@ class DetailUserActivity : AppCompatActivity() {
         binding = ActivityDetailUserBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val username = intent.getStringExtra(EXTRA_USERNAME)
-        val bundle = Bundle()
-        bundle.putString(EXTRA_USERNAME, username)
+        val username = intent.getStringExtra(EXTRA_USERNAME).orEmpty()
+        val bundle = Bundle().apply {
+            putString(EXTRA_USERNAME, username)
+        }
 
         viewModel.users.observe(this) { user ->
             setDetailUsers(user)
         }
 
-        if (username != null) {
+        if (username.isNotEmpty()) {
             viewModel.setUsersDetail(username)
         }
 
@@ -45,7 +46,6 @@ class DetailUserActivity : AppCompatActivity() {
         viewModel.isLoading.observe(this) {
             showLoading(it)
         }
-
     }
 
     private fun setDetailUsers(user: DetailUserResponse) {
@@ -63,10 +63,6 @@ class DetailUserActivity : AppCompatActivity() {
     }
 
     private fun showLoading(isLoading: Boolean) {
-        if (isLoading) {
-            binding.progressBar.visibility = View.VISIBLE
-        } else {
-            binding.progressBar.visibility = View.GONE
-        }
+        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
 }

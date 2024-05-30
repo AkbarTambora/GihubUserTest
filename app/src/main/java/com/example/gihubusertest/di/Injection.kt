@@ -9,7 +9,7 @@ import com.example.gihubusertest.utils.AppExecutors
 
 object Injection {
     fun provideRepository(context: Context): UserRepository {
-        val apiService = RetrofitClient.getApiService()
+        val apiService = RetrofitClient.apiInstance
         val database = UserDatabase.getInstance(context)
         val dao = database.userDao()
         val appExecutors = AppExecutors()

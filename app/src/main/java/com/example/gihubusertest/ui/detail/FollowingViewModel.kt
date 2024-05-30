@@ -5,33 +5,28 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.gihubusertest.data.model.User
-import com.example.gihubusertest.data.remote.api.RetrofitClient.Companion.getApiService
+import com.example.gihubusertest.data.remote.api.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class FollowingViewModel: ViewModel() {
+class FollowingViewModel : ViewModel() {
 
-    private val _listFollowing = MutableLiveData<ArrayList<User>>()
-    val listFollowing: LiveData<ArrayList<User>> = _listFollowing
+    private val _listFollowing = MutableLiveData<List<User>>()
+    val listFollowing: LiveData<List<User>> = _listFollowing
 
     fun setListFollowing(username: String) {
-        //RetrofitClient.apiInstance.getFollowingDetail(username)
-        getApiService().getFollowingDetail(username)
-            .enqueue(object : Callback<ArrayList<User>> {
-            override fun onResponse(call: Call<ArrayList<User>>, response: Response<ArrayList<User>>) {
-                if (response.isSuccessful) {
-                    _listFollowing.postValue(response.body())
+        RetrofitClient.apiInstance.getFollowingDetail(username)
+            .enqueue(object : Callback<List<User>> {
+                override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
+                    if (response.isSuccessful) {
+                        _listFollowing.postValue(response.body())
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<ArrayList<User>>, t: Throwable) {
-                Log.d("Failure", t.message ?: "Unknown error")
-            }
-        })
-    }
-
-    fun getUsersDetail(): LiveData<ArrayList<User>> {
-        return listFollowing
+                override fun onFailure(call: Call<List<User>>, t: Throwable) {
+                    Log.d("Failure", t.message ?: "Unknown error")
+                }
+            })
     }
 }

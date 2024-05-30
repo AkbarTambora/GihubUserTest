@@ -13,12 +13,13 @@ abstract class UserDatabase: RoomDatabase() {
     companion object {
         @Volatile
         private var instance: UserDatabase? = null
+
         fun getInstance(context: Context): UserDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
                     context.applicationContext,
                     UserDatabase::class.java, "User.db"
-                ).build()
+                ).build().also { instance = it }
             }
     }
 }

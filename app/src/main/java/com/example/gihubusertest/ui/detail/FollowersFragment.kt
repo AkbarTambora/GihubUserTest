@@ -5,28 +5,34 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.gihubusertest.R
-import com.example.gihubusertest.databinding.FragmentFollowBinding
+import com.example.gihubusertest.data.local.entity.UserEntity
 import com.example.gihubusertest.ui.main.UserAdapter
+import com.example.githubusertest.R
+import com.example.githubusertest.databinding.FragmentFollowBinding
 
-class FollowersFragment: Fragment(R.layout.fragment_follow) {
-
-    private var _binding : FragmentFollowBinding? = null
+class FollowersFragment : Fragment(R.layout.fragment_follow) {
+    private var _binding: FragmentFollowBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: FollowersViewModel
     private lateinit var adapter: UserAdapter
     private lateinit var username: String
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         val args = arguments
-        username = args?.getString(DetailUserActivity.EXTRA_USERNAME).toString()
+        username = args?.getString(DetailUserActivity.EXTRA_USERNAME).orEmpty()
 
-        super.onViewCreated(view, savedInstanceState)
         _binding = FragmentFollowBinding.bind(view)
 
-        adapter = UserAdapter()
-        adapter.notifyDataSetChanged()
+        adapter = UserAdapter(
+            onItemClick = { userEntity ->
+                // Tambahkan logika navigasi atau aksi lain di sini jika diperlukan
+            },
+            onBookmarkClick = { userEntity ->
+                // Tambahkan logika untuk toggle bookmark di sini jika diperlukan
+            }
+        )
 
         binding.apply {
             rvUser.layoutManager = LinearLayoutManager(activity)
@@ -35,16 +41,17 @@ class FollowersFragment: Fragment(R.layout.fragment_follow) {
         }
 
         showLoading(true)
-        viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(
-            FollowersViewModel::class.java)
+        viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(FollowersViewModel::class.java)
         viewModel.setListFollowers(username)
-        viewModel.getUsersDetail().observe(viewLifecycleOwner) {
-            if (it != null) {
-                adapter.setList(it)
+        viewModel.listFollowers.observe(viewLifecycleOwner) { users ->
+            if (users != null) {
+                val userEntities = users.map { user ->
+                    UserEntity(user.id, user.login, user.avatar_url, false)
+                }
+                adapter.submitList(userEntities)
                 showLoading(false)
             }
         }
-
     }
 
     private fun showLoading(state: Boolean) {
@@ -55,5 +62,4 @@ class FollowersFragment: Fragment(R.layout.fragment_follow) {
         super.onDestroyView()
         _binding = null
     }
-
 }

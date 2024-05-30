@@ -5,11 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
-import com.example.gihubusertest.BuildConfig
 import com.example.gihubusertest.data.local.entity.UserEntity
 import com.example.gihubusertest.data.local.room.UserDao
 import com.example.gihubusertest.data.remote.api.Api
 import com.example.gihubusertest.utils.AppExecutors
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class UserRepository private constructor(
     private val apiService: Api,
@@ -18,33 +19,40 @@ class UserRepository private constructor(
 ) {
     private val result = MediatorLiveData<Result<List<UserEntity>>>()
 
-    fun getListUser(): LiveData<Result<List<UserEntity>>> = liveData {
+    fun getListUser(query: String = ""): LiveData<Result<List<UserEntity>>> = liveData {
         emit(Result.Loading)
         try {
-            val response = apiService.getSearchUsersRep(BuildConfig.token)
-            val users = response.items
-            val usersList = users.map { user ->
-                val isBookmarked = userDao.isUsersBookmarked(user.id)
-                UserEntity(
-                    user.id,
-                    user.login,
-                    user.avatar_url,
-                    isBookmarked
-                )
+            val response = withContext(Dispatchers.IO) {
+                apiService.getSearchUsers(query).execute()
             }
-            userDao.deleteAll()
-            userDao.insertUsers(usersList)
+            if (response.isSuccessful) {
+                val users = response.body()?.items ?: emptyList()
+                val usersList = users.map { user ->
+                    val isBookmarked = userDao.isUserBookmarked(user.id)
+                    UserEntity(
+                        user.id,
+                        user.login,
+                        user.avatar_url,
+                        isBookmarked
+                    )
+                }
+                userDao.deleteAll()
+                userDao.insertUsers(usersList)
+                val localData: LiveData<Result<List<UserEntity>>> = userDao.getUsers().map { Result.Success(it) }
+                emitSource(localData)
+            } else {
+                emit(Result.Error(response.message()))
+            }
         } catch (e: Exception) {
             Log.d("UserRepository", "getListUser: ${e.message.toString()} ")
             emit(Result.Error(e.message.toString()))
         }
-        val localData: LiveData<Result<List<UserEntity>>> = userDao.getUsers().map { Result.Success(it) }
-        emitSource(localData)
     }
 
     fun getBookmarkedUsers(): LiveData<List<UserEntity>> {
         return userDao.getBookmarkedUsers()
     }
+
     suspend fun setBookmarkedUsers(user: UserEntity, bookmarkState: Boolean) {
         user.isBookmarked = bookmarkState
         userDao.updateUsers(user)

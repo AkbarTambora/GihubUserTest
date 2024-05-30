@@ -1,6 +1,6 @@
 package com.example.gihubusertest.data.model
 
-data class DetailUserResponse (
+data class DetailUserResponse(
     val login: String,
     val name: String,
     val id: Int,

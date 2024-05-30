@@ -2,64 +2,60 @@ package com.example.gihubusertest.ui.main
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.example.gihubusertest.data.model.DetailUserResponse
-import com.example.gihubusertest.data.model.User
-import com.example.gihubusertest.databinding.ItemUserBinding
+import com.example.gihubusertest.data.local.entity.UserEntity
+import com.example.githubusertest.R
+import com.example.githubusertest.databinding.ItemUserBinding
 
-class UserAdapter : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
-
-    private var userList: List<User> = emptyList()
-    private var userDetailList: List<DetailUserResponse> = emptyList()
-    private var onItemClickCallback: OnItemClickCallback? = null
-
-    fun setOnItemClickCallback(onItemClickCallback: OnItemClickCallback) {
-        this.onItemClickCallback = onItemClickCallback
-    }
-
-    fun setList(users: List<User>) {
-        userList = users
-        notifyDataSetChanged()
-    }
-
-    fun setDetailList(usersDetail: DetailUserResponse) {
-        userDetailList = listOf(usersDetail)
-        notifyDataSetChanged()
-    }
+class UserAdapter(
+    private val onItemClick: (UserEntity) -> Unit,
+    private val onBookmarkClick: (UserEntity) -> Unit
+) : ListAdapter<UserEntity, UserAdapter.UserViewHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val binding = ItemUserBinding.inflate(inflater, parent, false)
+        val binding = ItemUserBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return UserViewHolder(binding)
     }
 
-    override fun getItemCount(): Int = userList.size
-
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-        holder.bind(userList[position])
+        val user = getItem(position)
+        holder.bind(user)
     }
 
-    inner class UserViewHolder(private val binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(user: User) {
-            binding.root.setOnClickListener {
-                onItemClickCallback?.onItemClicked(user)
-            }
-
+    inner class UserViewHolder(private val binding: ItemUserBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(user: UserEntity) {
             with(binding) {
                 Glide.with(itemView)
-                    .load(user.avatar_url)
+                    .load(user.avatarUrl)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .centerCrop()
                     .into(ivUser)
                 tvUsername.text = user.login
+                ivBookmark.setImageResource(
+                    if (user.isBookmarked) R.drawable.ic_bookmarked_white
+                    else R.drawable.ic_bookmark_white
+                )
+                root.setOnClickListener { onItemClick(user) }
+                ivBookmark.setOnClickListener { onBookmarkClick(user) }
             }
         }
     }
 
-    interface OnItemClickCallback {
-        fun onItemClicked(data: User)
-    }
+    companion object {
+        val DIFF_CALLBACK: DiffUtil.ItemCallback<UserEntity> =
+            object : DiffUtil.ItemCallback<UserEntity>() {
+                override fun areItemsTheSame(oldItem: UserEntity, newItem: UserEntity): Boolean {
+                    return oldItem.id == newItem.id
+                }
 
+                override fun areContentsTheSame(oldItem: UserEntity, newItem: UserEntity): Boolean {
+                    return oldItem == newItem
+                }
+            }
+    }
 }

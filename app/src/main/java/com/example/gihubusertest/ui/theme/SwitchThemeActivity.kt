@@ -5,7 +5,7 @@ import android.widget.CompoundButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModelProvider
-import com.example.gihubusertest.R
+import com.example.githubusertest.R
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SwitchThemeActivity : AppCompatActivity() {
@@ -15,8 +15,8 @@ class SwitchThemeActivity : AppCompatActivity() {
 
         val switchTheme = findViewById<SwitchMaterial>(R.id.switch_theme)
 
-        val pref = SettingPreferences.getInstance(application.dataStore)
-        val themeViewModel = ViewModelProvider(this, ViewModelFactory(pref)).get(
+        val pref = SettingPreferences.getInstance(applicationContext.dataStore)
+        val themeViewModel = ViewModelProvider(this, ThemeViewModelFactory(pref)).get(
             ThemeViewModel::class.java
         )
         themeViewModel.getThemeSettings().observe(this) { isDarkModeActive: Boolean ->
