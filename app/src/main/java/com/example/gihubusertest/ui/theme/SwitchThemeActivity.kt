@@ -5,7 +5,7 @@ import android.widget.CompoundButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModelProvider
-import com.example.githubusertest.R
+import com.example.gihubusertest.R
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SwitchThemeActivity : AppCompatActivity() {

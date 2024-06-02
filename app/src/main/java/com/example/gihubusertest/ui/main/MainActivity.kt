@@ -17,8 +17,8 @@ import com.example.gihubusertest.ui.theme.SwitchThemeActivity
 import com.example.gihubusertest.ui.theme.ThemeViewModel
 import com.example.gihubusertest.ui.theme.ThemeViewModelFactory
 import com.example.gihubusertest.ui.theme.dataStore
-import com.example.githubusertest.R
-import com.example.githubusertest.databinding.ActivityMainBinding
+import com.example.gihubusertest.R
+import com.example.gihubusertest.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 

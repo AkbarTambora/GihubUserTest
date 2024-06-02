@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.gihubusertest.data.local.entity.UserEntity
-import com.example.githubusertest.R
-import com.example.githubusertest.databinding.ItemUserBinding
+import com.example.gihubusertest.R
+import com.example.gihubusertest.databinding.ItemUserBinding
 
 class UserAdapter(
     private val onItemClick: (UserEntity) -> Unit,

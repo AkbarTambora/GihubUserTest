@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.example.gihubusertest.ui.detail.FollowersFragment
 import com.example.gihubusertest.ui.detail.FollowingFragment
-import com.example.githubusertest.R
+import com.example.gihubusertest.R
 
 class SectionPagerAdapter(private val context: Context, fm: FragmentManager, data: Bundle) :
     FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {

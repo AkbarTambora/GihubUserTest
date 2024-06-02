@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.githubusertest"
+    namespace = "com.example.gihubusertest"
     compileSdk = 34
 
     buildFeatures {
@@ -14,14 +14,14 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.githubusertest"
+        applicationId = "com.example.gihubusertest"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "GITHUB_TOKEN", "\"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\"")
+        buildConfigField("String", "token", "\"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\"")
     }
 
     buildTypes {

@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gihubusertest.data.local.entity.UserEntity
 import com.example.gihubusertest.ui.main.UserAdapter
-import com.example.githubusertest.R
-import com.example.githubusertest.databinding.FragmentFollowBinding
+import com.example.gihubusertest.R
+import com.example.gihubusertest.databinding.FragmentFollowBinding
 
 class FollowersFragment : Fragment(R.layout.fragment_follow) {
     private var _binding: FragmentFollowBinding? = null
