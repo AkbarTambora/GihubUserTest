@@ -1,7 +1,9 @@
 package com.example.gihubusertest.ui.main
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -10,6 +12,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.gihubusertest.data.local.entity.UserEntity
 import com.example.gihubusertest.R
 import com.example.gihubusertest.databinding.ItemUserBinding
+import com.example.gihubusertest.ui.detail.DetailUserActivity
 
 class UserAdapter(
     private val onBookmarkClick: (UserEntity) -> Unit
@@ -23,9 +26,19 @@ class UserAdapter(
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         val user = getItem(position)
         holder.bind(user)
+
+        val ivBookmark = holder.binding.ivBookmark
+        if (user.isBookmarked) {
+            ivBookmark.setImageDrawable(ContextCompat.getDrawable(ivBookmark.context, R.drawable.ic_bookmarked_white))
+        } else {
+            ivBookmark.setImageDrawable(ContextCompat.getDrawable(ivBookmark.context, R.drawable.ic_bookmark_white))
+        }
+        ivBookmark.setOnClickListener {
+            onBookmarkClick(user)
+        }
     }
 
-    inner class UserViewHolder(private val binding: ItemUserBinding) :
+    inner class UserViewHolder(val binding: ItemUserBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(user: UserEntity) {
             with(binding) {
@@ -35,11 +48,12 @@ class UserAdapter(
                     .centerCrop()
                     .into(ivUser)
                 tvUsername.text = user.login
-                ivBookmark.setImageResource(
-                    if (user.isBookmarked) R.drawable.ic_bookmarked_white
-                    else R.drawable.ic_bookmark_white
-                )
-                ivBookmark.setOnClickListener { onBookmarkClick(user) }
+                itemView.setOnClickListener {
+                    val intent = Intent(itemView.context, DetailUserActivity::class.java).apply {
+                        putExtra(DetailUserActivity.EXTRA_USERNAME, user.login)
+                    }
+                    itemView.context.startActivity(intent)
+                }
             }
         }
     }
@@ -56,4 +70,15 @@ class UserAdapter(
                 }
             }
     }
+
+    fun updateUser(user: UserEntity) {
+        val index = currentList.indexOfFirst { it.id == user.id }
+        if (index != -1) {
+            val updatedList = currentList.toMutableList()
+            updatedList[index] = user
+            submitList(updatedList)
+        }
+    }
 }
+
+

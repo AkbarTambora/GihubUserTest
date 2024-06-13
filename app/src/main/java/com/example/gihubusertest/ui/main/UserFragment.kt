@@ -1,20 +1,18 @@
 package com.example.gihubusertest.ui.main
 
-import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gihubusertest.R
-import com.example.gihubusertest.databinding.FragmentUserBinding
 import com.example.gihubusertest.data.source.Result
+import com.example.gihubusertest.databinding.FragmentUserBinding
 import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.ViewModelProvider
-import com.example.gihubusertest.ui.detail.DetailUserActivity
 
 class UserFragment : Fragment() {
 
@@ -49,7 +47,6 @@ class UserFragment : Fragment() {
         viewModel = ViewModelProvider(this, factory).get(UserViewModel::class.java)
 
         setupViews()
-        observeViewModel()
     }
 
     private fun setupViews() {
@@ -74,64 +71,49 @@ class UserFragment : Fragment() {
                 searchUser()
             }
         }
+
+        if (tabName == TAB_USER) {
+            observeUsers()
+        } else if (tabName == TAB_FAVORITE) {
+            observeFavoriteUsers()
+        }
+
+        observeFavoriteStatusChanged()
     }
 
-    private fun observeViewModel() {
-        if (tabName == TAB_USER) {
-            viewModel.getListUser("").observe(viewLifecycleOwner) { result ->
-                if (result != null) {
-                    when (result) {
-                        is Result.Loading -> {
-                            binding.progressBar.visibility = View.VISIBLE
-                        }
-                        is Result.Success -> {
-                            binding.progressBar.visibility = View.GONE
-                            val userData = result.data
-                            userAdapter.submitList(userData)
-                        }
-                        is Result.Error -> {
-                            binding.progressBar.visibility = View.GONE
-                            Toast.makeText(
-                                context,
-                                "Terjadi kesalahan: ${result.error}",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
+    private fun observeUsers() {
+        viewModel.users.observe(viewLifecycleOwner, Observer { result ->
+            when (result) {
+                is Result.Loading -> showLoading(true)
+                is Result.Success -> {
+                    showLoading(false)
+                    userAdapter.submitList(result.data)
+                }
+                is Result.Error -> {
+                    showLoading(false)
+                    Toast.makeText(context, "Terjadi kesalahan: ${result.error}", Toast.LENGTH_SHORT).show()
                 }
             }
-        } else if (tabName == TAB_FAVORITE) {
-            viewModel.getBookmarkedUsers().observe(viewLifecycleOwner) { bookmarkedUsers ->
-                binding.progressBar.visibility = View.GONE
-                userAdapter.submitList(bookmarkedUsers)
-            }
+        })
+    }
+
+    private fun observeFavoriteUsers() {
+        viewModel.getBookmarkedUsers().observe(viewLifecycleOwner, Observer { bookmarkedUsers ->
+            showLoading(false)
+            userAdapter.submitList(bookmarkedUsers)
+        })
+    }
+
+    private fun observeFavoriteStatusChanged() {
+        viewModel.favoriteStatusChanged.observe(viewLifecycleOwner) { updatedUser ->
+            userAdapter.updateUser(updatedUser)
         }
     }
 
     private fun searchUser() {
         val query = binding.etQuery.text.toString().trim()
         if (query.isNotEmpty()) {
-            showLoading(true)
-            viewModel.getListUser(query).observe(viewLifecycleOwner) { result ->
-                when (result) {
-                    is Result.Loading -> {
-                        binding.progressBar.visibility = View.VISIBLE
-                    }
-                    is Result.Success -> {
-                        binding.progressBar.visibility = View.GONE
-                        val userData = result.data
-                        userAdapter.submitList(userData)
-                    }
-                    is Result.Error -> {
-                        binding.progressBar.visibility = View.GONE
-                        Toast.makeText(
-                            context,
-                            "Terjadi kesalahan: ${result.error}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-            }
+            viewModel.setSearchUsers(query)
         }
     }
 
@@ -139,15 +121,9 @@ class UserFragment : Fragment() {
         binding.progressBar.visibility = if (state) View.VISIBLE else View.GONE
     }
 
-    private fun navigateToDetailUser(username: String) {
-        val intent = Intent(requireContext(), DetailUserActivity::class.java).apply {
-            putExtra(DetailUserActivity.EXTRA_USERNAME, username)
-        }
-        startActivity(intent)
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
+

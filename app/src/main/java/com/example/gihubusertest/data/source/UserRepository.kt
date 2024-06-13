@@ -6,13 +6,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
-import com.example.gihubusertest.BuildConfig
-
 import com.example.gihubusertest.data.local.entity.UserEntity
 import com.example.gihubusertest.data.local.room.UserDao
 import com.example.gihubusertest.data.remote.api.ApiService
 import com.example.gihubusertest.utils.AppExecutors
-
 
 class UserRepository private constructor(
     private val apiService: ApiService,
@@ -25,9 +22,7 @@ class UserRepository private constructor(
         emit(Result.Loading)
         try {
             val response = apiService.getSearchUsers(query)
-            Log.d("Response", "Response Received")
             val users = response.items
-            Log.d("Users", "Users Created from Response")
             val userList = users.map { users ->
                 val isBookmarked = userDao.isUserBookmarked(users.id)
                 UserEntity(
@@ -37,20 +32,12 @@ class UserRepository private constructor(
                     isBookmarked
                 )
             }
-            Log.d("List users", "Mapping the List to Entity")
-            userDao.deleteAll()
-            Log.d("Delete users", "users that Deleted who not bookmarked")
-            userDao.insertUsers(userList)
-            Log.d("Insert Users", "Users listed to Entity")
+            userDao.insertUsers(userList) // Tambahkan pengguna ke database lokal tanpa menghapus yang sudah ada
         } catch (e: Exception) {
-            Log.d("User Repository", "getListUser: ${e.message.toString()} ")
             emit(Result.Error(e.message.toString()))
         }
         val localData: LiveData<Result<List<UserEntity>>> = userDao.getUsers().map { Result.Success(it) }
         emitSource(localData)
-        Log.d("LocalData", "User listed to Entity ditarik lewat DAO, lalu di mapping, lalu" +
-                "dimasukkan ke data class Success, object, untuk dikirim ke Injection, UserViewModel" +
-                "dan ViewModelFactory")
     }
 
     fun getBookmarkedUsers(): LiveData<List<UserEntity>> {
@@ -75,3 +62,5 @@ class UserRepository private constructor(
             }.also { instance = it }
     }
 }
+
+

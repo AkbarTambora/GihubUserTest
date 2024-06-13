@@ -24,19 +24,17 @@ class DetailUserActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val username = intent.getStringExtra(EXTRA_USERNAME).orEmpty()
-        val bundle = Bundle().apply {
-            putString(EXTRA_USERNAME, username)
+        if (username.isNotEmpty()) {
+            viewModel.setUsersDetail(username)
         }
 
         viewModel.users.observe(this) { user ->
             setDetailUsers(user)
         }
 
-        if (username.isNotEmpty()) {
-            viewModel.setUsersDetail(username)
-        }
-
-        val sectionPagerAdapter = SectionPagerAdapter(this, supportFragmentManager, bundle)
+        val sectionPagerAdapter = SectionPagerAdapter(this, supportFragmentManager, Bundle().apply {
+            putString(EXTRA_USERNAME, username)
+        })
         binding.apply {
             viewPager.adapter = sectionPagerAdapter
             tab.setupWithViewPager(viewPager)
