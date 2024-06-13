@@ -12,7 +12,6 @@ import com.example.gihubusertest.R
 import com.example.gihubusertest.databinding.ItemUserBinding
 
 class UserAdapter(
-    private val onItemClick: (UserEntity) -> Unit,
     private val onBookmarkClick: (UserEntity) -> Unit
 ) : ListAdapter<UserEntity, UserAdapter.UserViewHolder>(DIFF_CALLBACK) {
 
@@ -40,7 +39,6 @@ class UserAdapter(
                     if (user.isBookmarked) R.drawable.ic_bookmarked_white
                     else R.drawable.ic_bookmark_white
                 )
-                root.setOnClickListener { onItemClick(user) }
                 ivBookmark.setOnClickListener { onBookmarkClick(user) }
             }
         }

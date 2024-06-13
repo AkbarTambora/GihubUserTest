@@ -1,34 +1,25 @@
 package com.example.gihubusertest.ui.main
 
-import android.content.Context
 import android.os.Bundle
-import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
-import com.example.gihubusertest.ui.detail.FollowersFragment
-import com.example.gihubusertest.ui.detail.FollowingFragment
-import com.example.gihubusertest.R
+import androidx.viewpager2.adapter.FragmentStateAdapter
 
-class SectionPagerAdapter(private val context: Context, fm: FragmentManager, data: Bundle) :
-    FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-
-    private val fragmentBundle: Bundle = data
-
-    @StringRes
-    private val tabTitles = arrayOf(R.string.tab_1, R.string.tab_2)
-
-    override fun getCount(): Int = tabTitles.size
-
-    override fun getItem(position: Int): Fragment {
-        return when (position) {
-            0 -> FollowingFragment().apply { arguments = fragmentBundle }
-            1 -> FollowersFragment().apply { arguments = fragmentBundle }
-            else -> throw IllegalStateException("Invalid position: $position")
+class SectionPagerAdapter internal constructor(activity: AppCompatActivity) :
+    FragmentStateAdapter(activity) {
+    override fun createFragment(position: Int): Fragment {
+        val fragment = UserFragment()
+        val bundle = Bundle()
+        if (position == 0) {
+            bundle.putString(UserFragment.ARG_TAB, UserFragment.TAB_USER)
+        } else {
+            bundle.putString(UserFragment.ARG_TAB, UserFragment.TAB_FAVORITE)
         }
+        fragment.arguments = bundle
+        return fragment
     }
 
-    override fun getPageTitle(position: Int): CharSequence {
-        return context.resources.getString(tabTitles[position])
+    override fun getItemCount(): Int {
+        return 2
     }
 }

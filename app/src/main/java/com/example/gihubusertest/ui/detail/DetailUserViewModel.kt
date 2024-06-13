@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.gihubusertest.data.model.DetailUserResponse
-import com.example.gihubusertest.data.remote.api.RetrofitClient
+import com.example.gihubusertest.data.remote.api.ApiConfig
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -24,7 +24,9 @@ class DetailUserViewModel : ViewModel() {
 
     fun setUsersDetail(username: String) {
         _isLoading.value = true
-        RetrofitClient.apiInstance.getUserDetail(username).enqueue(object : Callback<DetailUserResponse> {
+        val client = ApiConfig.getApiService().getUserDetail(username)
+
+        client.enqueue(object : Callback<DetailUserResponse> {
             override fun onResponse(call: Call<DetailUserResponse>, response: Response<DetailUserResponse>) {
                 _isLoading.value = false
                 if (response.isSuccessful) {

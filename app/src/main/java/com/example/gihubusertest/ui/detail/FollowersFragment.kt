@@ -26,9 +26,6 @@ class FollowersFragment : Fragment(R.layout.fragment_follow) {
         _binding = FragmentFollowBinding.bind(view)
 
         adapter = UserAdapter(
-            onItemClick = { userEntity ->
-                // Tambahkan logika navigasi atau aksi lain di sini jika diperlukan
-            },
             onBookmarkClick = { userEntity ->
                 // Tambahkan logika untuk toggle bookmark di sini jika diperlukan
             }

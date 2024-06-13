@@ -2,17 +2,17 @@ package com.example.gihubusertest.data.remote.api
 
 import com.example.gihubusertest.data.model.DetailUserResponse
 import com.example.gihubusertest.data.model.User
-import com.example.gihubusertest.data.model.UserResponse
+import com.example.gihubusertest.data.remote.response.UserResponse
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-interface Api {
+interface ApiService {
     @GET("search/users")
-    fun getSearchUsers(
+    suspend fun getSearchUsers(
         @Query("q") query: String
-    ): Call<UserResponse>
+    ): UserResponse
 
     @GET("users/{username}")
     fun getUserDetail(

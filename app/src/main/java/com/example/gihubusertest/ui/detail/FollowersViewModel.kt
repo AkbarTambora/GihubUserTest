@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.gihubusertest.data.model.User
-import com.example.gihubusertest.data.remote.api.RetrofitClient
+import com.example.gihubusertest.data.remote.api.ApiConfig
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -16,7 +16,7 @@ class FollowersViewModel : ViewModel() {
     val listFollowers: LiveData<List<User>> = _listFollowers
 
     fun setListFollowers(username: String) {
-        RetrofitClient.apiInstance.getFollowersDetail(username)
+        ApiConfig.getApiService().getFollowersDetail(username)
             .enqueue(object : Callback<List<User>> {
                 override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
                     if (response.isSuccessful) {
