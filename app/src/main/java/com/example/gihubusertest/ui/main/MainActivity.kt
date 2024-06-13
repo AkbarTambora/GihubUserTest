@@ -4,22 +4,42 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.ViewModelProvider
+import com.example.gihubusertest.ui.theme.SettingPreferences
+import com.example.gihubusertest.ui.theme.SwitchThemeActivity
+import com.example.gihubusertest.ui.theme.ThemeViewModel
+import com.example.gihubusertest.ui.theme.ThemeViewModelFactory
+import com.example.gihubusertest.ui.theme.dataStore
 import com.example.gihubusertest.R
 import com.example.gihubusertest.databinding.ActivityMainBinding
-import com.example.gihubusertest.ui.theme.SwitchThemeActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var themeViewModel: ThemeViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val pref = SettingPreferences.getInstance(application.dataStore)
+        themeViewModel = ViewModelProvider(this, ThemeViewModelFactory(pref)).get(ThemeViewModel::class.java)
+
+        themeViewModel.getThemeSettings().observe(this) { isDarkModeActive ->
+            if (isDarkModeActive) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+        }
 
         val sectionsPagerAdapter = SectionPagerAdapter(this)
         binding.viewPager.adapter = sectionsPagerAdapter

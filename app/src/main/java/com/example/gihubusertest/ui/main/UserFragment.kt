@@ -9,10 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.gihubusertest.R
 import com.example.gihubusertest.data.source.Result
 import com.example.gihubusertest.databinding.FragmentUserBinding
 import androidx.core.widget.addTextChangedListener
@@ -85,26 +83,31 @@ class UserFragment : Fragment() {
     }
 
     private fun observeUsers() {
-        viewModel.users.observe(viewLifecycleOwner, Observer { result ->
+        viewModel.users.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> showLoading(true)
                 is Result.Success -> {
                     showLoading(false)
                     userAdapter.submitList(result.data)
                 }
+
                 is Result.Error -> {
                     showLoading(false)
-                    Toast.makeText(context, "Terjadi kesalahan: ${result.error}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        "Terjadi kesalahan: ${result.error}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
-        })
+        }
     }
 
     private fun observeFavoriteUsers() {
-        viewModel.getBookmarkedUsers().observe(viewLifecycleOwner, Observer { bookmarkedUsers ->
+        viewModel.getBookmarkedUsers().observe(viewLifecycleOwner) { bookmarkedUsers ->
             showLoading(false)
             userAdapter.submitList(bookmarkedUsers)
-        })
+        }
     }
 
     private fun observeFavoriteStatusChanged() {
