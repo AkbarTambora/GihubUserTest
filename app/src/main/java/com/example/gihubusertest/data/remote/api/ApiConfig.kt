@@ -1,5 +1,6 @@
 package com.example.gihubusertest.data.remote.api
 
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -25,10 +26,15 @@ object ApiConfig {
     fun getApiService(): ApiService {
         val BASE_URL = "https://api.github.com/"
 
-        val loggingInterceptor = HttpLoggingInterceptor()
-            .setLevel(HttpLoggingInterceptor.Level.BODY)
+        val authInterceptor = Interceptor { chain ->
+            val req = chain.request()
+            val requestHeaders = req.newBuilder()
+                .addHeader("Authorization", "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")
+                .build()
+            chain.proceed(requestHeaders)
+        }
         val client: OkHttpClient = OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
+            .addInterceptor(authInterceptor)
             .build()
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)

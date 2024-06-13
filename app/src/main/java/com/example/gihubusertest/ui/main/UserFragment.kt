@@ -1,5 +1,6 @@
 package com.example.gihubusertest.ui.main
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -11,20 +12,32 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gihubusertest.R
 import com.example.gihubusertest.databinding.FragmentUserBinding
 import com.example.gihubusertest.data.source.Result
+import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.ViewModelProvider
+import com.example.gihubusertest.ui.detail.DetailUserActivity
 
 class UserFragment : Fragment() {
 
     private var tabName: String? = null
 
     private var _binding: FragmentUserBinding? = null
-    private val binding get() = _binding
+    private val binding get() = _binding!!
+
+    private lateinit var viewModel: UserViewModel
+    private lateinit var userAdapter: UserAdapter
+
+    companion object {
+        const val ARG_TAB = "tab_name"
+        const val TAB_USER = "user"
+        const val TAB_FAVORITE = "favorite"
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user, container, false)
+    ): View {
+        _binding = FragmentUserBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -33,37 +46,54 @@ class UserFragment : Fragment() {
         tabName = arguments?.getString(ARG_TAB)
 
         val factory: ViewModelFactory = ViewModelFactory.getInstance(requireActivity())
-        val viewModel: UserViewModel by viewModels {
-            factory
-        }
+        viewModel = ViewModelProvider(this, factory).get(UserViewModel::class.java)
 
-        val userAdapter = UserAdapter { user ->
-            if (user.isBookmarked){
+        setupViews()
+        observeViewModel()
+    }
+
+    private fun setupViews() {
+        userAdapter = UserAdapter { user ->
+            if (user.isBookmarked) {
                 viewModel.deleteUser(user)
             } else {
                 viewModel.saveUser(user)
             }
         }
 
+        binding.rvUser.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            setHasFixedSize(true)
+            adapter = userAdapter
+        }
+
+        binding.btnSearch.setOnClickListener { searchUser() }
+
+        binding.etQuery.addTextChangedListener {
+            if (it?.toString()?.isNotEmpty() == true) {
+                searchUser()
+            }
+        }
+    }
+
+    private fun observeViewModel() {
         if (tabName == TAB_USER) {
             viewModel.getListUser("").observe(viewLifecycleOwner) { result ->
                 if (result != null) {
                     when (result) {
                         is Result.Loading -> {
-                            binding?.progressBar?.visibility = View.VISIBLE
+                            binding.progressBar.visibility = View.VISIBLE
                         }
-
                         is Result.Success -> {
-                            binding?.progressBar?.visibility = View.GONE
+                            binding.progressBar.visibility = View.GONE
                             val userData = result.data
                             userAdapter.submitList(userData)
                         }
-
                         is Result.Error -> {
-                            binding?.progressBar?.visibility = View.GONE
+                            binding.progressBar.visibility = View.GONE
                             Toast.makeText(
                                 context,
-                                "Terjadi kesalahan" + result.error,
+                                "Terjadi kesalahan: ${result.error}",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -72,26 +102,52 @@ class UserFragment : Fragment() {
             }
         } else if (tabName == TAB_FAVORITE) {
             viewModel.getBookmarkedUsers().observe(viewLifecycleOwner) { bookmarkedUsers ->
-                binding?.progressBar?.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
                 userAdapter.submitList(bookmarkedUsers)
             }
         }
+    }
 
-        binding?.rvUser?.apply {
-            layoutManager = LinearLayoutManager(context)
-            setHasFixedSize(true)
-            adapter = userAdapter
+    private fun searchUser() {
+        val query = binding.etQuery.text.toString().trim()
+        if (query.isNotEmpty()) {
+            showLoading(true)
+            viewModel.getListUser(query).observe(viewLifecycleOwner) { result ->
+                when (result) {
+                    is Result.Loading -> {
+                        binding.progressBar.visibility = View.VISIBLE
+                    }
+                    is Result.Success -> {
+                        binding.progressBar.visibility = View.GONE
+                        val userData = result.data
+                        userAdapter.submitList(userData)
+                    }
+                    is Result.Error -> {
+                        binding.progressBar.visibility = View.GONE
+                        Toast.makeText(
+                            context,
+                            "Terjadi kesalahan: ${result.error}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
+    private fun showLoading(state: Boolean) {
+        binding.progressBar.visibility = if (state) View.VISIBLE else View.GONE
     }
 
-    companion object {
-        const val ARG_TAB = "tab_name"
-        const val TAB_USER = "user"
-        const val TAB_FAVORITE = "favorite"
+    private fun navigateToDetailUser(username: String) {
+        val intent = Intent(requireContext(), DetailUserActivity::class.java).apply {
+            putExtra(DetailUserActivity.EXTRA_USERNAME, username)
+        }
+        startActivity(intent)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

@@ -49,13 +49,6 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
                 return true
             }
-            R.id.menu2 -> {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, FavoriteFragment())
-                    .addToBackStack(null)
-                    .commit()
-                return true
-            }
         }
         return super.onOptionsItemSelected(item)
     }

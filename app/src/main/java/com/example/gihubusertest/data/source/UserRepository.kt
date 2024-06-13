@@ -7,6 +7,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import com.example.gihubusertest.BuildConfig
+
 import com.example.gihubusertest.data.local.entity.UserEntity
 import com.example.gihubusertest.data.local.room.UserDao
 import com.example.gihubusertest.data.remote.api.ApiService
@@ -23,7 +24,7 @@ class UserRepository private constructor(
     fun getListUser(query: String): LiveData<Result<List<UserEntity>>> = liveData {
         emit(Result.Loading)
         try {
-            val response = apiService.getSearchUsers(BuildConfig.token)
+            val response = apiService.getSearchUsers(query)
             Log.d("Response", "Response Received")
             val users = response.items
             Log.d("Users", "Users Created from Response")
@@ -51,7 +52,7 @@ class UserRepository private constructor(
                 "dimasukkan ke data class Success, object, untuk dikirim ke Injection, UserViewModel" +
                 "dan ViewModelFactory")
     }
-    
+
     fun getBookmarkedUsers(): LiveData<List<UserEntity>> {
         return userDao.getBookmarkedUsers()
     }
@@ -60,7 +61,7 @@ class UserRepository private constructor(
         user.isBookmarked = bookmarkState
         userDao.updateUsers(user)
     }
-    
+
     companion object {
         @Volatile
         private var instance: UserRepository? = null
