@@ -1,9 +1,6 @@
 package com.example.gihubusertest.ui.main
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.gihubusertest.data.local.entity.UserEntity
 import com.example.gihubusertest.data.source.UserRepository
 import com.example.gihubusertest.data.source.Result
@@ -17,10 +14,16 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
     private val _favoriteStatusChanged = MutableLiveData<UserEntity>()
     val favoriteStatusChanged: LiveData<UserEntity> = _favoriteStatusChanged
 
-    fun setSearchUsers(query: String) {
+    fun setSearchUsers(query: String, isConnected: Boolean) {
         viewModelScope.launch {
-            userRepository.getListUser(query).observeForever {
-                _users.postValue(it)
+            if (isConnected) {
+                userRepository.getListUserFromApi(query).observeForever {
+                    _users.postValue(it)
+                }
+            } else {
+                userRepository.getListUserFromLocal(query).observeForever {
+                    _users.postValue(it)
+                }
             }
         }
     }
@@ -42,6 +45,6 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
     }
 
     fun getListUser(query: String): LiveData<Result<List<UserEntity>>> {
-        return userRepository.getListUser(query)
+        return userRepository.getListUserFromApi(query)
     }
 }

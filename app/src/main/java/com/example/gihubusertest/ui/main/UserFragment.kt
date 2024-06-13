@@ -1,5 +1,8 @@
 package com.example.gihubusertest.ui.main
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -113,7 +116,8 @@ class UserFragment : Fragment() {
     private fun searchUser() {
         val query = binding.etQuery.text.toString().trim()
         if (query.isNotEmpty()) {
-            viewModel.setSearchUsers(query)
+            val isConnected = isNetworkAvailable(requireContext())
+            viewModel.setSearchUsers(query, isConnected)
         }
     }
 
@@ -124,6 +128,18 @@ class UserFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+        return when {
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+            else -> false
+        }
     }
 }
 

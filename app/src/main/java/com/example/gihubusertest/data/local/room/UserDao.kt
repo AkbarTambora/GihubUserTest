@@ -12,7 +12,10 @@ interface UserDao {
     @Query("SELECT * FROM user WHERE bookmarked = 1")
     fun getBookmarkedUsers(): LiveData<List<UserEntity>>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Query("SELECT * FROM user WHERE login LIKE :query")
+    fun searchUsers(query: String): LiveData<List<UserEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUsers(users: List<UserEntity>)
 
     @Update
@@ -21,6 +24,6 @@ interface UserDao {
     @Query("DELETE FROM user WHERE bookmarked = 0")
     suspend fun deleteAll()
 
-    @Query("SELECT EXISTS(SELECT * FROM user WHERE id = :id AND bookmarked = 1)")
+    @Query("SELECT EXISTS(SELECT * FROM user WHERE id = :id)")
     suspend fun isUserBookmarked(id: Int): Boolean
 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
+import com.example.gihubusertest.BuildConfig
 import com.example.gihubusertest.data.local.entity.UserEntity
 import com.example.gihubusertest.data.local.room.UserDao
 import com.example.gihubusertest.data.remote.api.ApiService
@@ -18,25 +19,31 @@ class UserRepository private constructor(
 ) {
     private val result = MediatorLiveData<Result<List<UserEntity>>>()
 
-    fun getListUser(query: String): LiveData<Result<List<UserEntity>>> = liveData {
+    fun getListUserFromApi(query: String): LiveData<Result<List<UserEntity>>> = liveData {
         emit(Result.Loading)
         try {
             val response = apiService.getSearchUsers(query)
             val users = response.items
-            val userList = users.map { users ->
-                val isBookmarked = userDao.isUserBookmarked(users.id)
+            val userList = users.map { user ->
+                val isBookmarked = userDao.isUserBookmarked(user.id)
                 UserEntity(
-                    users.id,
-                    users.login,
-                    users.avatarUrl,
+                    user.id,
+                    user.login,
+                    user.avatarUrl,
                     isBookmarked
                 )
             }
-            userDao.insertUsers(userList) // Tambahkan pengguna ke database lokal tanpa menghapus yang sudah ada
+            userDao.deleteAll()
+            userDao.insertUsers(userList)
         } catch (e: Exception) {
             emit(Result.Error(e.message.toString()))
         }
         val localData: LiveData<Result<List<UserEntity>>> = userDao.getUsers().map { Result.Success(it) }
+        emitSource(localData)
+    }
+
+    fun getListUserFromLocal(query: String): LiveData<Result<List<UserEntity>>> = liveData {
+        val localData: LiveData<Result<List<UserEntity>>> = userDao.searchUsers(query).map { Result.Success(it) }
         emitSource(localData)
     }
 
