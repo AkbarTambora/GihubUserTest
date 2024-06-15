@@ -20,6 +20,10 @@ class UserRepository private constructor(
 ) {
     private val result = MediatorLiveData<Result<List<UserEntity>>>()
 
+    suspend fun isUserBookmarked(userId: Int): Boolean {
+        return userDao.isUserBookmarked(userId)
+    }
+
     fun getListUserFromApi(query: String): LiveData<Result<List<UserEntity>>> = liveData {
         emit(Result.Loading)
         try {
@@ -43,17 +47,16 @@ class UserRepository private constructor(
         emitSource(localData)
     }
 
+
     fun getListUserFromLocal(query: String): LiveData<Result<List<UserEntity>>> = liveData {
         val localData: LiveData<Result<List<UserEntity>>> = userDao.searchUsers(query).map { Result.Success(it) }
         emitSource(localData)
     }
 
-    fun getBookmarkedUsers(): LiveData<List<UserEntity>> {
-        return userDao.getBookmarkedUsers()
-    }
+    fun getBookmarkedUsers(): LiveData<List<UserEntity>> = userDao.getBookmarkedUsers()
 
-    suspend fun setBookmarkedUsers(user: UserEntity, bookmarkState: Boolean) {
-        user.isBookmarked = bookmarkState
+    suspend fun setBookmarkedUsers(user: UserEntity, isBookmarked: Boolean) {
+        user.isBookmarked = isBookmarked
         userDao.updateUsers(user)
     }
 

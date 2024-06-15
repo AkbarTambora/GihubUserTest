@@ -15,7 +15,7 @@ interface UserDao {
     @Query("SELECT * FROM user WHERE login LIKE :query")
     fun searchUsers(query: String): LiveData<List<UserEntity>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertUsers(users: List<UserEntity>)
 
     @Update
@@ -24,6 +24,6 @@ interface UserDao {
     @Query("DELETE FROM user WHERE bookmarked = 0")
     suspend fun deleteAll()
 
-    @Query("SELECT EXISTS(SELECT * FROM user WHERE id = :id)")
+    @Query("SELECT EXISTS(SELECT * FROM user WHERE id = :id AND bookmarked = 1)")
     suspend fun isUserBookmarked(id: Int): Boolean
 }
